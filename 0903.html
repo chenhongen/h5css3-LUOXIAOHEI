@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<head>
+<title> CHE Sudio - CSS3+HTML5罗小黑 </title>
+<style>
+	.xiaohei {
+		width: 350px;
+		height: 200px;
+		background: url(xx.png) no-repeat 0 0;
+		animation: toleft 2s infinite steps(11, end);
+		-moz-animation: toleft 1.5s infinite steps(11);
+		-webkit-animation: toleft 2s infinite steps(11);
+		z-index: -1;
+	}
+
+	@keyframes toleft {
+		/*0% {background-position:0;}*/
+		100%{ background-position: -4180px 0px;}
+	}
+	@-webkit-keyframes toleft {
+		100%{ background-position: -4180px 0px;}
+	}
+	@-moz-keyframes toleft {
+		100% {background-position: -4180px 0;}
+	}
+
+	#gan {
+		z-index: 1;
+		margin-left: 200px;
+	}
+
+	#cao {
+		display:none;
+	}
+
+	#v {
+		width:320px;
+	}
+
+	.container {
+		width: 45%;
+		height: 50%;
+		margin: auto;
+	}
+	.container > div { position: absolute;  };
+</style>
+
+</head>
+<body>
+	<div class="container">
+		<h4>CHE Sudio - CSS3+HTML5罗小黑:</h4>
+		快 <input id="v" type="range" min="0" max="100" /> 慢
+		<div id="xiaohei" class="xiaohei"></div>
+		<div class="dou">
+			<canvas id="gan" width="200" height="200" >
+				您的浏览器暂不支持canvas哟~
+			</canvas>
+			<canvas id="cao" width="200" height="200">
+				作者：陈宏恩；个人网站：http://rebey.cn；QQ:251601797
+			</canvas>
+		</div>
+	</div>
+</body>
+<script src="http://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
+<script type="text/javascript">
+	// 草杆画布
+	var canvas = $("#gan")[0];
+	var context = canvas.getContext('2d');
+	context.lineWidth = 4;
+	context.strokeStyle= "rgb(83,53,34)";
+	
+	// 草头画布
+	var canvas1 = $("#cao")[0];
+	var context1 = canvas1.getContext('2d');
+	context1.fillStyle = "rgb(188,181,141)";
+	context1.lineWidth = 4;
+	context1.strokeStyle= "rgb(83,53,34)";
+
+	var h = 30, // 高度（y轴坐标）
+		arr = [5,7,8,9,10,20,30,50,1,-50,-30,-20,-10,-8,-6,-5,-3], // 草头旋转角度数组
+		//arrDown = [-6,-7,-8,-9,-10,-20,-30,-50,1,50,30,20,10,8,6,5,4], // 草头下至上旋转角度数组
+		i = 0, // 数组下标
+		flag = true, // 切换标识
+		timer = null; // 定时器
+
+	// 绘制椭圆（草头）
+	function drawOval(ctx, h, neg) {
+		ctx.clearRect(0,0,200,200);//清除画布上的指定区域
+		ctx.beginPath();
+		
+		ctx.save();
+		ctx.translate(16,(h-i/8)+8); // 垂直变化
+		ctx.rotate(Math.PI/arr[i]*neg); // 旋转角度
+		ctx.scale(1,1/2); // 绘制椭圆
+		ctx.arc(0,0,15,0,Math.PI*2);
+		ctx.fill(); // 填充
+		ctx.stroke();
+		ctx.restore();
+
+		i++; // 数组遍历
+	}
+
+	// 贝塞尔曲线（草杆）绘制
+	function drawLine(h) {
+		context.clearRect(0,0,200,200);//清除画布上的指定区域
+		context.beginPath();
+		context.moveTo(20,h+5); // 起点
+		context.bezierCurveTo(80,100,120,100,200,100); // 
+		context.stroke();
+		return false;
+	}
+
+	// 绘制函数
+	function load(v) {
+		clearInterval(timer);
+		timer = setInterval(function(){
+			if(h===150) {flag = false; i = 0;} // 切换条件
+			if(h===30) {flag = true; i = 0;}
+
+			if(flag) {
+				h = ++h;
+				(h%8 == 0) && drawOval(context1, h, 1);
+			} else {
+				h = --h;
+				(h%8 == 0) && drawOval(context1, h, -1);
+			}
+			drawLine(h);
+
+			context.drawImage(canvas1,0,0); // 合并多画布
+		}, v);
+	}
+	
+	// 拖动 改变
+	$("#v").on("change",function() {
+
+		var cssText = 'toleft ' + this.value/50 + 's infinite steps(11, end)';
+		var div = $("#xiaohei");
+		div.css("animation",cssText);
+		div.css("-moz-animation",cssText);
+		div.css("-webkit-animation",cssText);
+
+		load(this.value/10);
+	});
+
+	// 初始化
+	$(function() {
+		$("#v").val(6);
+		load(6);
+	});
+
+</script>
+</html>
